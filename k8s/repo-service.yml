@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-service
+  namespace: codeguardian
+  labels:
+    app: repo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: repo-service
+  template:
+    metadata:
+      labels:
+        app: repo-service
+    spec:
+      containers:
+        - name: repo-service
+          image: codeguardian/repo-service:latest
+          ports:
+            - containerPort: 8001
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: repo-service
+  namespace: codeguardian
+spec:
+  selector:
+    app: repo-service
+  ports:
+    - port: 80
+      targetPort: 8001
+  type: ClusterIP
