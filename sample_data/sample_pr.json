@@ -1,0 +1,32 @@
+{
+  "repo": "company/backend",
+  "pr_id": 123,
+  "author": "developer",
+  "files": ["user_service.py", "auth.py"],
+  "diff_url": "https://github.com/company/backend/pull/123.diff",
+  "provider": "github",
+  "sample_code": {
+    "auth.py": "import sqlite3\ndef get_user(username):\n    conn = sqlite3.connect('users.db')\n    query = f'SELECT * FROM users WHERE username = {username}'\n    cursor = conn.execute(query)\n    return cursor.fetchone()\n\npassword = 'hardcoded_secret_123'\n",
+    "user_service.py": "def process_data(items):\n    result = []\n    for i in range(len(items)):\n        result.append(items[i] * 2)\n    return result\n"
+  },
+  "expected_issues": [
+    {
+      "file": "auth.py",
+      "type": "security",
+      "severity": "critical",
+      "message": "SQL injection via string formatting"
+    },
+    {
+      "file": "auth.py",
+      "type": "security",
+      "severity": "high",
+      "message": "Hardcoded credential"
+    },
+    {
+      "file": "user_service.py",
+      "type": "performance",
+      "severity": "low",
+      "message": "Inefficient iteration using range(len(...))"
+    }
+  ]
+}
